@@ -2,18 +2,15 @@ package UI;
 
 import java.io.Console;
 
-import App.User;
+import java.util.*;
+
+import App.*;
 
 public class Login {
 	
-	public static void displayLoginScreen() {
+	public static boolean displayLoginScreen() {
 		ClearConsole.clearConsole();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println("\t\t\t\t\t********************* Welcome to Stocker *********************");
-		System.out.println();
+		StaticViews.banner();
 		User user = new User();
 		
 		Console c = System.console();
@@ -25,6 +22,13 @@ public class Login {
 		System.out.println();
 	
 		user.setPassword(new String(c.readPassword("\t\t\t\t\t\t\tEnter Password: ")));
+		Auth auth = new Auth();
+		if(auth.auth_user(user.getUsername(), user.getPassword())){
+			Dashboard dashboard = new Dashboard();
+			ClearConsole.clearConsole();
+			return true;
+		}
+		return false;
 	}
 	
 }
