@@ -1,70 +1,125 @@
 package App;
 
-public class Stock {
-	private String productId;
-	private String productName;
-	private String productBrand;
-	private int productQuantity;
-	private double productPricePerUnit;
-	private double productPriceTotal;
-	private String supplierName;
-	
-	/**
-	 * Purchase Stock
-	 * 
-	 * */
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
-	public void purchaseStock(Stock stock) {
-		
-	}
-		
-	/**
-	 * Getters
-	 * */
-	public String getProductId() {
-		return productId;
-	}
-	public String getProductName() {
-		return productName;
-	}
-	public String getProductBrand() {
-		return productBrand;
-	}
-	public int getProductQuantity() {
-		return productQuantity;
-	}
-	public double getProductPricePerUnit() {
-		return productPricePerUnit;
-	}
-	public double getProductPriceTotal() {
-		return productPriceTotal;
-	}
-	public String getSupplierName() {
-		return supplierName;
+import Database.DbConnection;
+
+public class Stock {
+	
+	
+	public static boolean addStockToDb(Product product) {
+		Connection conn = DbConnection.connectDb();
+		String query = "INSERT INTO stock(product_name, product_brand, product_quantity, product_price_per_unit,supplier_name) VALUES(?,?,?,?,?)";
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement(query);
+			
+			stmt.setString(1, product.getProductName());
+			stmt.setString(2, product.getProductBrand());
+			stmt.setInt(3, product.getProductQuantity());
+			stmt.setDouble(4, product.getProductPricePerUnit());
+			stmt.setString(5, product.getSupplierName());
+			
+			int result = stmt.executeUpdate();
+			System.out.println(result);
+			if(result >= 1) {
+				return true;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
-	/**
-	 * Setters
-	 * */
-	public void setProductId(String productId) {
-		this.productId = productId;
+	public static ArrayList<Product> viewAllStocks(){
+		Connection conn = DbConnection.connectDb();
+		String query = "SELECT * FROM stock";
+		ArrayList<Product> stockList = new ArrayList<Product>();
+		try {
+			PreparedStatement stmt = conn.prepareStatement(query);
+			ResultSet result = stmt.executeQuery();
+			
+			while(result.next()) {
+				Product product = new Product();
+				product.setProductId(result.getInt(1));
+				product.setProductName(result.getString(2));
+				product.setProductBrand(result.getString(3));
+				product.setProductQuantity(result.getInt(4));
+				product.setProductPricePerUnit(result.getDouble(5));
+				product.setProductPriceTotal(product.getProductPricePerUnit()*product.getProductQuantity());
+				product.setSupplierName(result.getString(6));
+				stockList.add(product);
+			}
+			return stockList;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
-	public void setProductName(String productName) {
-		this.productName = productName;
+	
+	public static Product getStockById(int id) {
+		Product product = new Product();
+		
+		Connection conn = DbConnection.connectDb();
+		String query = "SELECT * FROM stock WHERE product_id = ?";
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1,id);
+			ResultSet result = stmt.executeQuery();
+			while(result.next()) {
+				product.setProductId(result.getInt(1));
+				product.setProductName(result.getString(2));
+				product.setProductBrand(result.getString(3));
+				product.setProductQuantity(result.getInt(4));
+				product.setProductPricePerUnit(result.getDouble(5));
+				product.setProductPriceTotal(product.getProductPricePerUnit()*product.getProductQuantity());
+				product.setSupplierName(result.getString(6));
+			}
+			return product;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
-	public void setProductBrand(String productBrand) {
-		this.productBrand = productBrand;
+	
+	public static boolean updateStock(Product product) {
+		Connection conn = DbConnection.connectDb();
+		String query = "UPDATE stock SET product_name = ? , product_brand = ? , product_quantity = ? , product_price_per_unit = ? , supplier_name = ? WHERE product_id = ?";
+		try {
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setString(1, product.getProductName());
+			stmt.setString(2, product.getProductBrand());
+			stmt.setInt(3, product.getProductQuantity());
+			stmt.setDouble(4, product.getProductPricePerUnit());
+			stmt.setString(5, product.getSupplierName());
+			stmt.setInt(6, product.getProductId());
+			int result = stmt.executeUpdate();
+			if(result > 0) {
+				return true;
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
-	public void setProductQuantity(int productQuantity) {
-		this.productQuantity = productQuantity;
-	}
-	public void setProductPricePerUnit(double productPricePerUnit) {
-		this.productPricePerUnit = productPricePerUnit;
-	}
-	public void setProductPriceTotal(double productPriceTotal) {
-		this.productPriceTotal = productPriceTotal;
-	}
-	public void setSupplierName(String supplierName) {
-		this.supplierName = supplierName;
+	
+	public static boolean deleteStock(int id) {
+		Connection conn = DbConnection.connectDb();
+		String query = "DELETE FROM stock WHERE product_id = ?";
+		try{
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, id);
+			int result = stmt.executeUpdate();
+			return result > 0 ? true : false;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }
