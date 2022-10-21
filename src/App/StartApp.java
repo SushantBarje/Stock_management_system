@@ -16,15 +16,11 @@ public class StartApp extends Stock{
 	/**
 	 * Constants variable declaration and initialization for user choices. 
 	 * */
-	public final static int LOGIN = 1;
-	public final static int EXIT = 2;
-	public final static int ADD_STOCK = 3;
-	public final static int VIEW_STOCK = 4;
-	public final static int UPDATE_STOCK = 5;
-	public final static int DELETE_STOCK = 6;
-	public final static int PREV_PAGE = 7;
-	public final static int SAVE_CHANGES = 8;
-	
+	public final static int ADD_STOCK = 1;
+	public final static int VIEW_STOCK = 2;
+	public final static int SELL_STOCK = 3;
+	public final static int EXIT = 4;
+
 	public void printLine(String s) {
 		System.out.print(s);
 	}
@@ -75,6 +71,10 @@ public class StartApp extends Stock{
 			this.addStock();
 		}else if(choice == VIEW_STOCK) {
 			this.viewStock();
+		}else if(choice == SELL_STOCK) {
+			this.sellStock();
+		}else {
+			System.exit(1);
 		}
 	}
 	
@@ -131,7 +131,7 @@ public class StartApp extends Stock{
 	
 	public void viewStock() throws IOException {
 		ClearConsole.clearConsole();
-		staticViews.showAllStocksView(Stock.viewAllStocks());
+		staticViews.showAllStocksView(Stock.viewAllStocks(), 1);
 		this.printNLine("");
 		int lastChoice;
 		int id = 0;
@@ -269,6 +269,91 @@ public class StartApp extends Stock{
 		}
 		ClearConsole.clearConsole();
 		this.adminDashboard();
+	}
+	
+	public void sellStock() throws IOException {
+		ClearConsole.clearConsole();
+		staticViews.showAllStocksView(Stock.viewAllStocks(), 2);
+		this.printNLine("");
+		int lastChoice;
+		int id = 0;
+		while(true) {
+			this.printLine("\t\t\t\t\t\t\t\t\t\t\t\tEnter your choice: ");
+			String choice = new String(br.readLine());
+			if(choice.length() <= 0) {
+				ClearConsole.clearConsole();
+				lastChoice = 1;
+				break;
+				
+			}
+			
+			if(Pattern.matches("[S]-[0-9]*", choice)) {
+				String[] splitArray = choice.split("-");
+				if(splitArray[0].toLowerCase().equals("s")) {
+					lastChoice = 2;
+					id = Integer.parseInt(splitArray[1]);
+					break;
+					
+				}else {
+					this.printNLine("\t\t\t\t\t\t\t\t\t\t\t\tYou entered wrong choice..");
+					this.printNLine("");
+				}
+			}else {
+				this.printNLine("\t\t\t\t\t\t\t\t\t\t\t\tYou entered wrong choice..");
+				this.printNLine("");
+			}
+		}
+		
+		if(lastChoice == 1) {
+			this.adminDashboard();
+		}else if(lastChoice == 2) {
+			this.printNLine("");
+			Product product = Stock.getStockById(id);
+			while(true) {
+				this.printLine("\t\t\t\t\t\t\t\t\t\t\t\tEnter the Quantity : ");
+				int quantity = 0;
+				try {
+					quantity = Integer.parseInt(br.readLine());
+				}catch(Exception e) {
+					ClearConsole.clearConsole();
+					this.adminDashboard();
+				}
+				
+				int totalQuantity = product.getProductQuantity()-quantity;
+				if(totalQuantity < 0) {
+					this.printNLine("");
+					this.printLine("\t\t\t\t\t\t\t\t\t\t\t\t\tQuantity is greater than stock available !...");
+					this.printNLine("");
+				}else {
+					this.printNLine("");
+					this.printNLine("");
+					this.printLine("\t\t\t\t\t\t\t\t\t\t\t\tTotal Price : " + product.getProductPricePerUnit()*quantity);
+					this.printNLine("");
+					this.printNLine("");
+					this.printLine("\t\t\t\t\t\t\t\t\t\t\t\tConfirm Sell Stock ? ");
+					this.printNLine("");
+					this.printNLine("");
+					this.printNLine("\t\t\t\t\t\t\t\t\t\t\t\t  Y) Yes    N) No");
+					String choice = br.readLine();
+					if(choice.toLowerCase().equals("y")) {
+						if(Stock.sellStockFromDb(id, totalQuantity)) {
+							this.printNLine("");
+							this.printLine("\t\t\t\t\t\t\t\t\t\t\t Stock Sold..");
+						}else {
+							this.printNLine("");
+							this.printLine("\t\t\t\t\t\t\t\t\t\t\t\t Stock Not Sold...");
+						}
+						this.printNLine("");
+						this.printLine("Press any key and enter to continue...");
+						String s = br.readLine();
+					}
+					ClearConsole.clearConsole();
+					this.adminDashboard();
+				}
+			}
+			
+		}
+		
 	}
 	
 	public void wrongAuth() throws IOException {

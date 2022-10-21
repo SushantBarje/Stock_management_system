@@ -122,4 +122,22 @@ public class Stock {
 		}
 		return false;
 	}
+	
+	public static boolean sellStockFromDb(int id, int quantity) {
+		Connection conn = DbConnection.connectDb();
+		String query = "UPDATE stock SET product_quantity = ? WHERE product_id = ?";
+		try {
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1,quantity);
+			stmt.setInt(2, id);
+			int result = stmt.executeUpdate();
+			if(result > 0 ) {
+				return true;
+			}
+			return false;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 }

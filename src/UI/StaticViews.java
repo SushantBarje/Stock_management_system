@@ -30,7 +30,7 @@ public class StaticViews {
 	public void dashboardView() {
 		System.out.println("\t\t\t\t\t\t+---------------------------+-----------------------+-------------------------+-------------------------+");
 		System.out.println("\t\t\t\t\t\t|                           |                       |                         |                         |");
-		System.out.println("\t\t\t\t\t\t|       3) Add Stock        |     4) View Stock     |     5) Update Stock     |     6) Delete Stock     |");
+		System.out.println("\t\t\t\t\t\t|       1) Add Stock        |     2) View Stock     |     3) Sell Stock       |     6) Exit             |");
 		System.out.println("\t\t\t\t\t\t|                           |                       |                         |                         |");
 		System.out.println("\t\t\t\t\t\t+---------------------------+-----------------------+-------------------------+-------------------------+");
 	}
@@ -43,15 +43,25 @@ public class StaticViews {
 		System.out.println("");
 	}
 	
-	public void showAllStocksView(ArrayList<Product> stockList) {
+	public void showAllStocksView(ArrayList<Product> stockList, int viewFor) {
 		this.banner();
 		System.out.println("");
-		System.out.println("\t\t\t\t\t\t\t\t\t\t       ------- View Stock -------");
-		System.out.println("\t\t\t\t\t\t\t\t\t\t    =================================");
-		System.out.println("");
-		System.out.println("");
-		System.out.print("\t\t\t\t\t\t\t  For Edit product   :  Type E-[ID] ");
-		System.out.println("\t\t\t For Delete product :  Type D-[ID] ");
+	
+		if(viewFor == 1) {
+			System.out.println("\t\t\t\t\t\t\t\t\t\t       ------- View Stock -------");
+			System.out.println("\t\t\t\t\t\t\t\t\t\t    =================================");
+			System.out.println("");
+			System.out.println("");
+			System.out.print("\t\t\t\t\t\t\t  For Edit product   :  Type E-[ID] ");
+			System.out.println("\t\t\t For Delete product :  Type D-[ID] ");
+		}else {
+			System.out.println("\t\t\t\t\t\t\t\t\t\t        ------- Sell Stock -------");
+			System.out.println("\t\t\t\t\t\t\t\t\t\t    =================================");
+			System.out.println("");
+			System.out.println("");
+			System.out.print("\t\t\t\t\t\t\t  For Sell product   :  Type S-[ID] ");
+		}
+
 		System.out.println("");
 		System.out.println("\t\t\t\t\t\t\t\t\t\t\t   Press any key for back.");
 		System.out.format("%30s+------------+-------------------------+---------------------+--------------------+--------------------+-------------------+--------------------+%n"," ");
